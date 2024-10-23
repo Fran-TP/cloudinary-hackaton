@@ -39,7 +39,9 @@ export default function Home() {
   ]
 
   useEffect(() => {
-    setIsClient(true)
+    if (typeof window !== 'undefined') {
+      import('two-up-element')
+    }
   }, [])
 
   const handleIngredientSelect = (ingredient: string) => {
