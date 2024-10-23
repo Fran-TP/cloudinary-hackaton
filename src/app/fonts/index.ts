@@ -1,13 +1,5 @@
-import localFont from 'next/font/local'
+import { Butcherman, Creepster } from 'next/font/google'
 
-export const geistSans = localFont({
-  src: './GeistMonoVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900'
-})
+export const butchearman = Butcherman({ weight: '400', subsets: ['latin'] })
 
-export const geistMono = localFont({
-  src: './GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900'
-})
+export const creepster = Creepster({ weight: '400', subsets: ['latin'] })

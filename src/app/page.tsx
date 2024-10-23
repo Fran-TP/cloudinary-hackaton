@@ -1,101 +1,176 @@
+'use client'
+
+import { useState } from 'react'
+import Github from './ui/icons/github'
+import {
+  CldImage,
+  CldUploadButton,
+  type CloudinaryUploadWidgetInfo
+} from 'next-cloudinary'
 import Image from 'next/image'
+import { getCldImageUrl } from 'next-cloudinary'
+import 'two-up-element'
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'two-up': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >
+    }
+  }
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{' '}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [resource, setResource] = useState<
+    CloudinaryUploadWidgetInfo | undefined | string
+  >()
+  const [selectedIngredients, setSelectedIngredients] = useState<string[]>([])
+  const [promptCustom, setPromptCustom] = useState<string>()
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert w-5 h-5"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const halloweenIngredients = [
+    'Calabaza',
+    'Ojos de gelatina',
+    'Sangre falsa (jarabe)',
+    'Fantasmas de merengue',
+    'Arañas de chocolate',
+    'Manzanas envenenadas',
+    'Dedos de bruja (galletas)',
+    'Cerebros de gelatina'
+  ]
+
+  // Manejar la selección de ingredientes
+  const handleIngredientSelect = (ingredient: string) => {
+    setSelectedIngredients(prevIngredients =>
+      prevIngredients.includes(ingredient)
+        ? prevIngredients.filter(i => i !== ingredient)
+        : [...prevIngredients, ingredient]
+    )
+  }
+
+  const handleSubmitRecipe = () => {
+    if (resource && typeof resource === 'object') {
+      const ingredientsText = selectedIngredients.join(' ')
+      const prompt = `Crea una receta espeluznante con los siguientes ingredientes ${ingredientsText}`
+
+      setPromptCustom(prompt)
+    }
+  }
+  return (
+    <div className="grid grid-rows-[1fr_1fr] items-center justify-items-center min-h-screen">
+      <header className="w-full flex justify-between p-4 items-center fixed z-10 top-0">
+        <h1 className="text-4xl text-[#d8bd91]">SpookyBites</h1>
+        <nav>
+          <ul>
+            <li>
+              <a href="test">
+                <Github className="size-6 opacity-80 hover:opacity-100 transition-opacity duration-300" />
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main className="relative w-full h-full">
+        <div className="h-full bg-bannerChef bg-no-repeat bg-cover w-full">
+          <div className="flex flex-col items-center justify-center w-full h-full">
+            <h2 className="text-6xl font-bold text-center text-foreground text-[#ec4f16]">
+              ¡Bienvenidos a SpookyBites!
+            </h2>
+            <p className="text-3xl text-center text-foreground text-[#d8bd91]">
+              Transforma tus recetas en creaciones escalofriantes
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center w-full h-full bg-[#101010]">
+          {typeof resource === 'undefined' && (
+            <>
+              <h2 className="text-3xl font-bold text-center text-foreground text-[#d8bd91]">
+                Ingresa tu ingrediente secreto
+              </h2>
+              <CldUploadButton
+                onSuccess={(result, { widget }) => {
+                  setResource(result?.info)
+                  widget.close()
+                }}
+                uploadPreset="spookybites"
+                className="bg-[#d8bd91] text-[#101010] p-3 rounded-lg mt-4"
+                options={{
+                  sources: ['local'],
+                  multiple: false,
+                  maxFiles: 1,
+                  language: 'es',
+                  text: {
+                    es: {
+                      or: 'O',
+                      menu: {
+                        files: 'Subir desde tu dispositivo'
+                      },
+                      local: {
+                        browse: 'Seleccionar',
+                        dd_title_single: 'Arrastra tu imagen aquí'
+                      }
+                    }
+                  }
+                }}
+              >
+                Subir imagen
+              </CldUploadButton>
+            </>
+          )}
+          {typeof resource === 'object' && (
+            <div className="flex flex-col items-center">
+              <two-up>
+                <Image
+                  className="h-auto"
+                  src={resource.secure_url}
+                  alt="Imagen subida"
+                  width={500}
+                  height={500}
+                />
+                <CldImage
+                  className="h-auto"
+                  alt="Imagen transformada"
+                  src={resource.public_id}
+                  width="500"
+                  height="500"
+                  replaceBackground={promptCustom ? promptCustom : undefined}
+                />
+              </two-up>
+
+              <section className="mt-4">
+                <h3 className="text-2xl font-bold text-center text-foreground text-[#d8bd91]">
+                  Selecciona tus ingredientes espeluznantes:
+                </h3>
+                <ul className="flex flex-wrap justify-center mt-4 gap-4">
+                  {halloweenIngredients.map(ingredient => (
+                    <li
+                      key={ingredient}
+                      className={`cursor-pointer p-2 border-2 rounded-md ${
+                        selectedIngredients.includes(ingredient)
+                          ? 'bg-[#ec4f16] text-white'
+                          : 'bg-[#d8bd91] text-black'
+                      }`}
+                      onClick={() => handleIngredientSelect(ingredient)}
+                      onKeyDown={() => handleIngredientSelect(ingredient)}
+                    >
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <button
+                type="button"
+                onClick={handleSubmitRecipe}
+                className="bg-[#ec4f16] text-white p-3 rounded-lg mt-4"
+              >
+                Generar receta espeluznante
+              </button>
+            </div>
+          )}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   )
 }
