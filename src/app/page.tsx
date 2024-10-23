@@ -1,31 +1,23 @@
-import { useEffect, useState } from 'react'
+'use client'
+
+import { useState } from 'react'
 import Github from './ui/icons/github'
 import {
   CldImage,
   CldUploadButton,
   type CloudinaryUploadWidgetInfo
 } from 'next-cloudinary'
-import Image from 'next/image'
-import 'two-up-element'
+import dynamic from 'next/dynamic'
+const TwoUpWrapper = dynamic(() => import('./ui/TwoUpWrapper'), {
+  ssr: false
+})
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'two-up': React.DetailedHTMLProps<
-        React.HTMLAttributes<HTMLElement>,
-        HTMLElement
-      >
-    }
-  }
-}
-
-export default function Home() {
+export default function App() {
   const [resource, setResource] = useState<
     CloudinaryUploadWidgetInfo | undefined | string
   >()
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([])
   const [promptCustom, setPromptCustom] = useState<string>()
-  const [isClient, setIsClient] = useState(false)
 
   const halloweenIngredients = [
     'Calabaza',
@@ -37,12 +29,6 @@ export default function Home() {
     'Dedos de bruja (galletas)',
     'Cerebros de gelatina'
   ]
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('two-up-element')
-    }
-  }, [])
 
   const handleIngredientSelect = (ingredient: string) => {
     setSelectedIngredients(prevIngredients =>
@@ -122,26 +108,13 @@ export default function Home() {
               </CldUploadButton>
             </>
           )}
-          {typeof resource === 'object' && isClient && (
+          {typeof resource === 'object' && (
             <div className="flex flex-col items-center">
-              <two-up>
-                <Image
-                  className="h-auto"
-                  src={resource.secure_url}
-                  alt="Imagen subida"
-                  width={500}
-                  height={500}
-                />
-                <CldImage
-                  className="h-auto"
-                  alt="Imagen transformada"
-                  src={resource.public_id}
-                  width="500"
-                  height="500"
-                  replaceBackground={promptCustom ? promptCustom : undefined}
-                />
-              </two-up>
-
+              <TwoUpWrapper
+                imageUrl={resource.secure_url}
+                publicId={resource.public_id}
+                promptCustom={promptCustom}
+              />
               <section className="mt-4">
                 <h3 className="text-2xl font-bold text-center text-foreground text-[#d8bd91]">
                   Selecciona tus ingredientes espeluznantes:
