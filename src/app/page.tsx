@@ -1,6 +1,4 @@
-'use client'
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Github from './ui/icons/github'
 import {
   CldImage,
@@ -8,7 +6,6 @@ import {
   type CloudinaryUploadWidgetInfo
 } from 'next-cloudinary'
 import Image from 'next/image'
-import { getCldImageUrl } from 'next-cloudinary'
 import 'two-up-element'
 
 declare global {
@@ -28,6 +25,7 @@ export default function Home() {
   >()
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([])
   const [promptCustom, setPromptCustom] = useState<string>()
+  const [isClient, setIsClient] = useState(false)
 
   const halloweenIngredients = [
     'Calabaza',
@@ -40,7 +38,10 @@ export default function Home() {
     'Cerebros de gelatina'
   ]
 
-  // Manejar la selección de ingredientes
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const handleIngredientSelect = (ingredient: string) => {
     setSelectedIngredients(prevIngredients =>
       prevIngredients.includes(ingredient)
@@ -57,6 +58,7 @@ export default function Home() {
       setPromptCustom(prompt)
     }
   }
+
   return (
     <div className="grid grid-rows-[1fr_1fr] items-center justify-items-center min-h-screen">
       <header className="w-full flex justify-between p-4 items-center fixed z-10 top-0">
@@ -118,7 +120,7 @@ export default function Home() {
               </CldUploadButton>
             </>
           )}
-          {typeof resource === 'object' && (
+          {typeof resource === 'object' && isClient && (
             <div className="flex flex-col items-center">
               <two-up>
                 <Image
