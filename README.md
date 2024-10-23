@@ -9,10 +9,8 @@
 ## Funcionalidades
 
 - Subida de recetas con imágenes de platos temáticos de Halloween.
-- Aplicación de efectos visuales terroríficos (niebla, sombras, filtros de color).
+- Selección de ingredientes terroríficos.
 - Almacenamiento y gestión de imágenes mediante [Cloudinary](https://cloudinary.com/).
-- Galería interactiva donde los usuarios pueden ver y votar las mejores recetas.
-- Descarga y compartición de imágenes procesadas en redes sociales.
 
 ---
 
@@ -31,4 +29,23 @@
    ```bash
    git clone https://github.com/tu-usuario/spookybites.git
    cd spookybites
+   ```
+
+2. Instala las dependencias:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Crea un archivo .env en el directorio raíz y agrega tus credenciales de Cloudinary:
+
+   ```makefile
+   CLOUDINARY_CLOUD_NAME=tu_cloud_name
+   CLOUDINARY_API_KEY=tu_api_key
+   CLOUDINARY_API_SECRET=tu_api_secret
+   ```
+
+4. Inicia el servidor local:
+   ```bash
+   pnpm run dev
    ```
